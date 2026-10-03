@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Онлайн-тестирование</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    background: #f0f2f5; color: #1a1a1a;
+    margin: 0; padding: 40px 20px;
+    min-height: 100vh;
+    display: flex; align-items: flex-start; justify-content: center;
+  }
+  .container { max-width: 560px; width: 100%; }
+  h1 {
+    text-align: center; color: #1a1a1a;
+    font-size: 28px; margin: 0 0 28px;
+    font-weight: 600;
+  }
+
+  /* ===== выдвигающиеся разделы ===== */
+  .accordion { display: flex; flex-direction: column; gap: 14px; }
+
+  .acc-header {
+    display: flex; align-items: center; justify-content: space-between;
+    width: 100%; padding: 20px 24px;
+    background: #fff; color: #1a1a1a;
+    border: 2px solid #e0e0e0; border-radius: 12px;
+    font-family: inherit; font-size: 17px; font-weight: 600;
+    text-align: left; cursor: pointer;
+    transition: all 0.15s;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+  }
+  .acc-header:hover { border-color: #0066cc; background: #eef4ff; }
+  .acc-header.open { border-color: #0066cc; background: #eef4ff; }
+  .acc-arrow {
+    color: #0066cc; font-size: 13px; line-height: 1;
+    transition: transform 0.2s;
+  }
+  .acc-header.open .acc-arrow { transform: rotate(180deg); }
+
+  .acc-panel { display: none; padding-top: 14px; }
+  .acc-panel.open { display: block; }
+
+  /* ===== список тестов внутри раздела ===== */
+  .test-list { display: flex; flex-direction: column; gap: 12px; }
+  .test-btn {
+    display: block; width: 100%;
+    padding: 18px 24px;
+    background: #fff; color: #1a1a1a;
+    border: 2px solid #e0e0e0; border-radius: 12px;
+    font-size: 16px; font-weight: 500;
+    text-align: left; cursor: pointer;
+    text-decoration: none;
+    transition: all 0.15s;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+  }
+  .test-btn:hover {
+    border-color: #0066cc;
+    background: #eef4ff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,102,204,0.15);
+  }
+  .test-btn::after {
+    content: "→";
+    float: right;
+    color: #0066cc;
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  .test-btn:hover::after { opacity: 1; }
+
+  .loading { text-align: center; padding: 20px; color: #888; }
+  .error-box {
+    color: #c62828; background: #fff; border: 2px solid #ffcdd2;
+    border-radius: 12px; padding: 20px; text-align: center; line-height: 1.5;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Онлайн-тестирование</h1>
+  <div id="app">
+    <div class="loading">Загрузка...</div>
+  </div>
+</div>
+
+<script src="common.js"></script>
+<script>
+function renderList(containerId, tests, hrefFor) {
+  const box = document.getElementById(containerId);
+  box.innerHTML = "";
+
+  if (!tests.length) {
+    box.innerHTML = '<div class="loading">Пока ничего нет</div>';
+    return;
+  }
+
+  tests.forEach(test => {
+    const a = document.createElement("a");
+    a.className = "test-btn";
+    a.href = hrefFor(test);
+    a.textContent = test.title;
+    box.appendChild(a);
+  });
+}
+
+// Одновременно открыт только один раздел:
+// клик по заголовку закрывает остальные панели, а свою открывает (или закрывает, если была открыта)
+function initAccordion() {
+  const headers = Array.from(document.querySelectorAll(".acc-header"));
+  const panels = Array.from(document.querySelectorAll(".acc-panel"));
+
+  function closeAll() {
+    panels.forEach(p => p.classList.remove("open"));
+    headers.forEach(h => {
+      h.classList.remove("open");
+      h.setAttribute("aria-expanded", "false");
+    });
+  }
+
+  headers.forEach(header => {
+    header.addEventListener("click", () => {
+      const panel = document.getElementById(header.dataset.target);
+      const wasOpen = panel.classList.contains("open");
+
+      closeAll();
+
+      if (!wasOpen) {
+        panel.classList.add("open");
+        header.classList.add("open");
+        header.setAttribute("aria-expanded", "true");
+      }
+    });
+  });
+}
+
+async function loadTests() {
+  const app = document.getElementById("app");
+
+  try {
+    const resp = await fetch("tests.json");
+    if (!resp.ok) throw new Error("Не найден tests.json");
+    const tests = await resp.json();
+
+    const professions = tests.filter(t => (t.group || "profession") === "profession");
+    const works = tests.filter(t => t.group === "work");
+
+    app.innerHTML = `
+      <div class="accordion">
+
+        <div class="acc-item">
+          <button type="button" class="acc-header" data-target="panel-profession" aria-expanded="false">
+            <span>Тесты по профессии</span>
+            <span class="acc-arrow">▼</span>
+          </button>
+          <div class="acc-panel" id="panel-profession">
+            <div class="test-list" id="professionList"></div>
+          </div>
+        </div>
+
+        <div class="acc-item">
+          <button type="button" class="acc-header" data-target="panel-work" aria-expanded="false">
+            <span>Тесты по видам работ</span>
+            <span class="acc-arrow">▼</span>
+          </button>
+          <div class="acc-panel" id="panel-work">
+            <div class="test-list" id="workList"></div>
+          </div>
+        </div>
+
+      </div>
+    `;
+
+    renderList("professionList", professions, t => "test.html?id=" + encodeURIComponent(t.id));
+    renderList("workList", works, t => "block.html?id=" + encodeURIComponent(t.id));
+
+    initAccordion();
+
+  } catch (e) {
+    app.innerHTML = `
+      <div class="error-box">
+        ❌ Ошибка: ${e.message}<br>
+        Проверь, что файл <code>tests.json</code> лежит рядом с <code>index.html</code>,
+        и что сайт открывается через сервер, а не как file://
+      </div>`;
+  }
+}
+
+loadTests();
+</script>
+</body>
+</html>
