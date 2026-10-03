@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Выбор билета</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    background: #f0f2f5; color: #1a1a1a;
+    margin: 0; padding: 40px 20px;
+    min-height: 100vh;
+    display: flex; align-items: flex-start; justify-content: center;
+  }
+  .container { max-width: 560px; width: 100%; }
+  h1 {
+    text-align: center; color: #1a1a1a;
+    font-size: 26px; margin: 0 0 8px; font-weight: 600;
+  }
+  .subtitle {
+    text-align: center; color: #777; font-size: 14px; margin-bottom: 28px;
+  }
+  .test-list { display: flex; flex-direction: column; gap: 12px; }
+  .test-btn {
+    display: block; width: 100%;
+    padding: 18px 24px;
+    background: #fff; color: #1a1a1a;
+    border: 2px solid #e0e0e0; border-radius: 12px;
+    font-size: 17px; font-weight: 500;
+    text-align: left; cursor: pointer;
+    text-decoration: none;
+    transition: all 0.15s;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+  }
+  .test-btn:hover {
+    border-color: #0066cc;
+    background: #eef4ff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,102,204,0.15);
+  }
+  .test-btn::after {
+    content: "→";
+    float: right;
+    color: #0066cc;
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  .test-btn:hover::after { opacity: 1; }
+  .test-btn .meta {
+    display: block; margin-top: 4px;
+    font-size: 13px; font-weight: 400; color: #777;
+  }
+  /* билет, пройденный на 100% */
+  .test-btn.passed {
+    border-color: #66bb6a;
+    background: #e8f5e9;
+  }
+  .test-btn.passed:hover {
+    border-color: #43a047;
+    background: #dcedc8;
+    box-shadow: 0 4px 12px rgba(67,160,71,0.18);
+  }
+  .test-btn.passed::after {
+    content: "✅";
+    opacity: 1;
+  }
+  .test-btn.passed .meta { color: #2e7d32; }
+  .legend {
+    margin-top: 18px; text-align: center;
+    font-size: 13px; color: #2e7d32;
+  }
+  .reset-link {
+    display: block; margin-top: 16px; text-align: center;
+    font-size: 13px; color: #999; text-decoration: none;
+  }
+  .reset-link:hover { color: #c62828; text-decoration: underline; }
+  .reset-done {
+    margin-top: 16px; text-align: center;
+    font-size: 13px; color: #2e7d32;
+  }
+  .back-wrap { text-align: center; margin-top: 28px; }
+  .back-link { color: #0066cc; text-decoration: none; font-size: 15px; }
+  .back-link:hover { text-decoration: underline; }
+  .loading { text-align: center; padding: 20px; color: #888; }
+  .error-box {
+    color: #c62828; background: #fff; border: 2px solid #ffcdd2;
+    border-radius: 12px; padding: 20px; text-align: center; line-height: 1.5;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1 id="blockTitle">Загрузка...</h1>
+  <div class="subtitle" id="blockInfo"></div>
+  <div class="test-list" id="ticketList">
+    <div class="loading">Загрузка...</div>
+  </div>
+  <div class="back-wrap">
+    <a class="back-link" href="index.html">← Назад к списку тестов</a>
+  </div>
+</div>
+
+<script src="common.js"></script>
+<script>
+const blockId = new URLSearchParams(window.location.search).get("id");
+
+async function loadBlock() {
+  const titleEl = document.getElementById("blockTitle");
+  const infoEl = document.getElementById("blockInfo");
+  const listEl = document.getElementById("ticketList");
+
+  try {
+    const [testsResp, qResp] = await Promise.all([
+      fetch("tests.json"),
+      fetch("questions.json")
+    ]);
+    if (!testsResp.ok) throw new Error("Не найден tests.json");
+    if (!qResp.ok) throw new Error("Не найден questions.json");
+
+    const tests = await testsResp.json();
+    const all = await qResp.json();
+
+    const block = tests.find(t => t.id === blockId && t.group === "work");
+    if (!block) throw new Error("Блок не найден");
+
+    const pool = all[block.topic] || [];
+    const tickets = splitIntoTickets(pool.length, block.ticketSize);
+
+    titleEl.textContent = block.title;
+    infoEl.textContent = pool.length
+      ? `Всего ${questionsWord(pool.length)} · ${ticketsWord(tickets.length)}`
+      : "";
+
+    if (!tickets.length) {
+      listEl.innerHTML = '<div class="loading">В этом блоке пока нет вопросов</div>';
+      return;
+    }
+
+    renderTickets(listEl, block, tickets);
+
+  } catch (e) {
+    titleEl.textContent = "Ошибка";
+    infoEl.textContent = "";
+    listEl.innerHTML = `<div class="error-box">❌ ${e.message}<br>
+      Проверь, что файлы <code>tests.json</code> и <code>questions.json</code> на месте.</div>`;
+  }
+}
+
+// Список билетов: пройденные на 100% показываем зелёными
+function renderTickets(listEl, block, tickets) {
+  listEl.innerHTML = "";
+  let passedCount = 0;
+
+  tickets.forEach(ticket => {
+    const a = document.createElement("a");
+    const result = getTicketResult(block.id, ticket.number);
+    const passed = !!result && result.percent === 100;
+    if (passed) passedCount++;
+
+    a.className = "test-btn" + (passed ? " passed" : "");
+    a.href = "test.html?id=" + encodeURIComponent(block.id) + "&ticket=" + ticket.number;
+
+    let meta = questionsWord(ticket.count);
+    if (passed) {
+      meta = "✅ " + result.correct + " из " + result.total + " — 100%";
+    } else if (result) {
+      meta = "лучший результат: " + result.correct + " из " + result.total + " (" + result.percent + "%)";
+    }
+
+    a.innerHTML = `Билет ${ticket.number}<span class="meta">${meta}</span>`;
+    listEl.appendChild(a);
+  });
+
+  if (passedCount) {
+    const legend = document.createElement("div");
+    legend.className = "legend";
+    legend.textContent = "Зелёным отмечены билеты, пройденные на 100%";
+    listEl.appendChild(legend);
+  }
+
+  // Сброс отметок по этому блоку — нужен, когда тесты проходят на общем компьютере
+  if (hasBlockResults(block.id)) {
+    const reset = document.createElement("a");
+    reset.className = "reset-link";
+    reset.href = "#";
+    reset.textContent = "Сбросить отметки по этому блоку";
+    reset.addEventListener("click", event => {
+      event.preventDefault();
+      if (!confirm("Сбросить отметки о прохождении по блоку «" + block.title + "»?")) return;
+      clearBlockResults(block.id);
+      renderTickets(listEl, block, tickets);
+    });
+    listEl.appendChild(reset);
+  }
+}
+
+loadBlock();
+</script>
+</body>
+</html>
