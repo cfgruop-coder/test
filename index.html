@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Онлайн-тестирование</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    background: #f0f2f5; color: #1a1a1a;
+    margin: 0; padding: 40px 20px;
+    min-height: 100vh;
+    display: flex; align-items: flex-start; justify-content: center;
+  }
+  .container { max-width: 560px; width: 100%; }
+  h1 {
+    text-align: center; color: #1a1a1a;
+    font-size: 28px; margin: 0 0 28px;
+    font-weight: 600;
+  }
+  .section-title {
+    font-size: 15px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.4px; color: #666;
+    margin: 0 0 12px; padding-left: 2px;
+  }
+  .section-title + .test-list { margin-bottom: 32px; }
+  .test-list { display: flex; flex-direction: column; gap: 14px; }
+  .test-btn {
+    display: block; width: 100%;
+    padding: 20px 24px;
+    background: #fff; color: #1a1a1a;
+    border: 2px solid #e0e0e0; border-radius: 12px;
+    font-size: 17px; font-weight: 500;
+    text-align: left; cursor: pointer;
+    text-decoration: none;
+    transition: all 0.15s;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+  }
+  .test-btn:hover {
+    border-color: #0066cc;
+    background: #eef4ff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,102,204,0.15);
+  }
+  .test-btn::after {
+    content: "→";
+    float: right;
+    color: #0066cc;
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  .test-btn:hover::after { opacity: 1; }
+  .test-btn .meta {
+    display: block; margin-top: 6px;
+    font-size: 13px; font-weight: 400; color: #777;
+  }
+  .loading { text-align: center; padding: 20px; color: #888; }
+  .error-box {
+    color: #c62828; background: #fff; border: 2px solid #ffcdd2;
+    border-radius: 12px; padding: 20px; text-align: center; line-height: 1.5;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Онлайн-тестирование</h1>
+  <div id="app">
+    <div class="loading">Загрузка...</div>
+  </div>
+</div>
+
+<script src="common.js"></script>
+<script>
+function renderList(containerId, tests, hrefFor) {
+  const box = document.getElementById(containerId);
+  box.innerHTML = "";
+
+  if (!tests.length) {
+    box.innerHTML = '<div class="loading">Пока ничего нет</div>';
+    return;
+  }
+
+  tests.forEach(test => {
+    const a = document.createElement("a");
+    a.className = "test-btn";
+    a.href = hrefFor(test);
+    a.textContent = test.title;
+    box.appendChild(a);
+  });
+}
+
+async function loadTests() {
+  const app = document.getElementById("app");
+
+  try {
+    const resp = await fetch("tests.json");
+    if (!resp.ok) throw new Error("Не найден tests.json");
+    const tests = await resp.json();
+
+    const professions = tests.filter(t => (t.group || "profession") === "profession");
+    const works = tests.filter(t => t.group === "work");
+
+    app.innerHTML = `
+      <h2 class="section-title">Тесты по профессии</h2>
+      <div class="test-list" id="professionList"></div>
+
+      <h2 class="section-title">Тесты по видам работ</h2>
+      <div class="test-list" id="workList"></div>
+    `;
+
+    renderList("professionList", professions, t => "test.html?id=" + encodeURIComponent(t.id));
+    renderList("workList", works, t => "block.html?id=" + encodeURIComponent(t.id));
+
+  } catch (e) {
+    app.innerHTML = `
+      <div class="error-box">
+        ❌ Ошибка: ${e.message}<br>
+        Проверь, что файл <code>tests.json</code> лежит рядом с <code>index.html</code>,
+        и что сайт открывается через сервер, а не как file://
+      </div>`;
+  }
+}
+
+loadTests();
+</script>
+</body>
+</html>
