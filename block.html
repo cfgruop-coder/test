@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Выбор билета</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="common.css">
+<script>
+  // тема выбирается до первой отрисовки, чтобы страница не мигала
+  try {
+    var savedTheme = localStorage.getItem("theme.v1");
+    if (!savedTheme) {
+      savedTheme = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark" : "light";
+    }
+    document.documentElement.setAttribute("data-theme", savedTheme);
+  } catch (e) {}
+</script>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-header__inner">
+    <a class="site-brand" href="index.html">
+      <div class="site-logo">✓</div>
+      <div>
+        <div class="site-title">Внешняя оценка знаний</div>
+        <div class="site-subtitle">Тесты по охране труда</div>
+      </div>
+    </a>
+  </div>
+</header>
+
+<main class="page page--narrow">
+  <div id="blockHead"></div>
+  <div id="blitzSlot" style="margin-bottom:18px;"></div>
+  <div id="blockProgress"></div>
+  <div id="filterRow"></div>
+  <div class="tickets" id="ticketList">
+    <div class="skeleton" style="grid-column:1/-1;">
+      <div class="skeleton__row"></div>
+      <div class="skeleton__row"></div>
+      <div class="skeleton__row"></div>
+    </div>
+  </div>
+  <div id="extraLinks"></div>
+  <div style="text-align:center; margin-top:22px;">
+    <a class="link-chip" href="index.html"><span class="marks" data-icon="home" data-size="16"></span>На главную</a>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="site-footer__inner">
+    <span>Внешняя оценка знаний · тесты по охране труда</span>
+    <span>Версия от 03.10.2026</span>
+  </div>
+</footer>
+
+<script src="common.js"></script>
+<script>
+const blockId = new URLSearchParams(window.location.search).get("id");
+
+// Список билетов: пройденные на 100% показываем зелёными,
+// билеты с попыткой — мягко-жёлтыми
+function renderTickets(block, tickets) {
+  const listEl = document.getElementById("ticketList");
+  const progressEl = document.getElementById("blockProgress");
+  const filterEl = document.getElementById("filterRow");
+  const extraEl = document.getElementById("extraLinks");
+  const info = blockInfo(block.topic);
+
+  listEl.innerHTML = "";
+  filterEl.innerHTML = "";
+  extraEl.innerHTML = "";
+
+  let passedCount = 0;
+  let triedCount = 0;
+
+  tickets.forEach(function (ticket) {
+    const result = getTicketResult(block.id, ticket.number);
+    const passed = !!result && result.percent === 100;
+    if (passed) passedCount++;
+    else if (result) triedCount++;
+  });
+
+  // прогресс по блоку
+  const percent = tickets.length ? Math.round(passedCount / tickets.length * 100) : 0;
+  progressEl.style.marginBottom = "16px";
+  progressEl.innerHTML =
+    '<div class="block-progress">' +
+      '<div class="block-progress__line">' +
+        '<span>Пройдено билетов: <b>' + passedCount + ' из ' + tickets.length + '</b></span>' +
+        '<span>' + percent + '%</span>' +
+      '</div>' +
+      '<div class="block-progress__bar">' +
+        '<div class="block-progress__fill" style="width:' + percent + '%"></div>' +
+      '</div>' +
+    '</div>';
+
+  // фильтр: показывать все или только непройденные
+  let onlyLeft = false;
+
+  function paint() {
+    listEl.innerHTML = "";
+
+    tickets.forEach(function (ticket) {
+      const result = getTicketResult(block.id, ticket.number);
+      const passed = !!result && result.percent === 100;
+
+      if (onlyLeft && passed) return;
+
+      const a = document.createElement("a");
+      a.className = "ticket" + (passed ? " ticket--passed" : (result ? " ticket--tried" : ""));
+      a.href = "test.html?id=" + encodeURIComponent(block.id) + "&ticket=" + ticket.number;
+
+      let meta = questionsWord(ticket.count);
+      if (passed) meta = "пройден на 100%";
+      else if (result) meta = "лучший: " + result.percent + "%";
+
+      a.innerHTML =
+        '<span class="ticket__num">Билет ' + ticket.number + '</span>' +
+        '<span class="ticket__meta">' + escapeHtml(meta) + '</span>' +
+        (passed ? '<span class="ticket__mark">' + uiIcon("check", 14) + '</span>'
+                : (result ? '<span class="ticket__dot"></span>' : ''));
+
+      listEl.appendChild(a);
+    });
+
+    if (!listEl.children.length) {
+      listEl.innerHTML = '<div class="empty" style="grid-column:1/-1;">Все билеты пройдены — ' +
+        'можно снять фильтр</div>';
+    }
+  }
+
+  const left = tickets.length - passedCount;
+  if (passedCount && left) {
+    filterEl.style.marginBottom = "14px";
+    filterEl.innerHTML = '<div class="filter-row">' +
+      '<button type="button" class="filter-chip active" data-only="0">Все ' + tickets.length + '</button>' +
+      '<button type="button" class="filter-chip" data-only="1">Непройденные ' + left + '</button>' +
+      '</div>';
+
+    filterEl.querySelectorAll(".filter-chip").forEach(function (chip) {
+      chip.addEventListener("click", function () {
+        onlyLeft = chip.dataset.only === "1";
+        filterEl.querySelectorAll(".filter-chip").forEach(function (c) { c.classList.remove("active"); });
+        chip.classList.add("active");
+        paint();
+      });
+    });
+  }
+
+  paint();
+
+  if (passedCount) {
+    const legend = document.createElement("div");
+    legend.className = "legend";
+    legend.style.marginTop = "12px";
+    legend.textContent = "Зелёным отмечены билеты, пройденные на 100%";
+    extraEl.appendChild(legend);
+  }
+
+  // сброс отметок по блоку
+  if (hasBlockResults(block.id)) {
+    const reset = document.createElement("a");
+    reset.className = "link-quiet";
+    reset.href = "#";
+    reset.textContent = "Сбросить отметки по этому блоку";
+    reset.addEventListener("click", function (event) {
+      event.preventDefault();
+      if (!confirm("Сбросить отметки о прохождении по блоку «" + block.title + "»?")) return;
+      clearBlockResults(block.id);
+      renderTickets(block, tickets);
+    });
+    extraEl.appendChild(reset);
+  }
+}
+
+// Заранее подтягиваем вопросы блока — тогда выбранный билет откроется без ожидания
+function warmUp(topic) {
+  const run = function () {
+    fetch("q-" + topic + ".json", { cache: "no-cache" }).catch(function () { /* не критично */ });
+  };
+  if (window.requestIdleCallback) requestIdleCallback(run, { timeout: 1500 });
+  else setTimeout(run, 300);
+}
+
+// Ссылка на блиц-опрос по этому блоку
+function renderBlitzLink(block) {
+  const slot = document.getElementById("blitzSlot");
+  if (!slot) return;
+
+  const info = blockInfo(block.topic);
+  const a = document.createElement("a");
+  a.className = "card-link card-link--block";
+  a.href = "blitz.html?block=" + encodeURIComponent(block.id);
+  a.style.setProperty("--block", info.color);
+  a.style.setProperty("--block-soft", info.soft);
+
+  a.innerHTML =
+    '<span class="card-link__icon">' + uiIcon("bolt", 20) + '</span>' +
+    '<span class="card-link__body">' +
+      '<span class="card-link__title">Блиц по этому блоку</span>' +
+      '<span class="card-link__meta">Быстрые вопросы с таймером — 15 секунд на ответ</span>' +
+    '</span>' +
+    '<span class="card-link__chev">›</span>';
+
+  slot.innerHTML = "";
+  slot.appendChild(a);
+}
+
+async function loadBlock() {
+  const headEl = document.getElementById("blockHead");
+  const listEl = document.getElementById("ticketList");
+
+  try {
+    // counts.json весит меньше килобайта — весь банк вопросов здесь не нужен
+    const results = await Promise.all([
+      fetchJson("tests.json"),
+      fetchJson("counts.json")
+    ]);
+    const tests = results[0];
+    const counts = (results[1] && results[1].counts) || {};
+
+    const block = tests.find(function (t) { return t.id === blockId && t.group === "work"; });
+    if (!block) throw new Error("Блок не найден");
+
+    const info = blockInfo(block.topic);
+    const total = counts[block.topic] || 0;
+    const tickets = splitIntoTickets(total, block.ticketSize);
+
+    document.title = block.title + " — выбор билета";
+
+    headEl.innerHTML =
+      '<div class="page-accent" style="background:' + info.color + '"></div>' +
+      '<h1 class="page-title"><span style="color:' + info.color + '">' + info.icon + '</span> ' +
+      escapeHtml(block.title) + '</h1>' +
+      '<p class="page-sub">' + (total ? "Всего " + questionsWord(total) + " · " + ticketsWord(tickets.length) : "") + '</p>';
+
+    if (!tickets.length) {
+      listEl.innerHTML = '<div class="empty">В этом блоке пока нет вопросов</div>';
+      return;
+    }
+
+    renderTickets(block, tickets);
+    renderBlitzLink(block);
+    warmUp(block.topic);
+
+  } catch (e) {
+    headEl.innerHTML = '<h1 class="page-title">Ошибка</h1>';
+    listEl.innerHTML = '<div class="error-box" style="grid-column:1/-1;">' +
+      uiIcon("cross", 18) + " " + escapeHtml(e.message) + '<br>' +
+      'Проверь, что файлы <b>tests.json</b> и <b>counts.json</b> на месте.</div>';
+  }
+}
+
+loadBlock();
+</script>
+</body>
+</html>
