@@ -149,16 +149,14 @@ function renderQuick(works, counts) {
 }
 
 // карточка-обложка раздела: видна только на широком экране
-function coverCard(img, badge, title, sub, meta, href) {
+function coverCard(img, title, sub, meta, href) {
   return '<a class="cover-card" href="' + href + '">' +
     '<span class="cover-card__img">' +
       '<img src="' + img + '" alt="" width="256" height="336" loading="lazy">' +
-      '<span class="cover-card__badge">' + badge + '</span>' +
     '</span>' +
     '<span class="cover-card__title">' + escapeHtml(title) + '</span>' +
     '<span class="cover-card__sub">' + escapeHtml(sub) + '</span>' +
     '<span class="cover-card__meta">' + escapeHtml(meta) + '</span>' +
-    '<span class="cover-card__go">Начать →</span>' +
   '</a>';
 }
 
@@ -321,20 +319,20 @@ async function loadTests() {
 
       '<div class="covers">' +
 
-        coverCard("cover-memo.png", "4 мин", "Памятка по первой помощи", "Барьер ОЗ.04",
+        coverCard("cover-memo.png", "Памятка по первой помощи", "Барьер ОЗ.04",
           "8 вопросов для проверки", "memo.html") +
 
-        coverCard("cover-professions.png", professions.length, "Тесты по профессии",
+        coverCard("cover-professions.png", "Тесты по профессии",
           professions.length + " " + plural(professions.length, "должность", "должности", "должностей"),
           "50 вопросов в каждом", "professions.html") +
 
-        coverCard("cover-works.png", totalTickets, "Тесты по видам работ",
+        coverCard("cover-works.png", "Тесты по видам работ",
           works.length + " " + plural(works.length, "блок", "блока", "блоков"),
           plural(totalTickets, "билет", "билета", "билетов") + " · " +
             totalQuestions + " " + plural(totalQuestions, "вопрос", "вопроса", "вопросов"),
           "works.html") +
 
-        coverCard("cover-blitz.png", works.length + professions.length, "Блиц-опрос", "на время",
+        coverCard("cover-blitz.png", "Блиц-опрос", "на время",
           "20, 50 или 100 вопросов", "blitz.html") +
 
       '</div>' +
