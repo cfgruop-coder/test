@@ -153,10 +153,12 @@ function coverCard(img, title, sub, meta, href) {
   return '<a class="cover-card" href="' + href + '">' +
     '<span class="cover-card__img">' +
       '<img src="' + img + '" alt="" width="256" height="336" loading="lazy">' +
+      '<span class="cover-card__text">' +
+        '<span class="cover-card__title">' + escapeHtml(title) + '</span>' +
+        '<span class="cover-card__sub">' + escapeHtml(sub) + '</span>' +
+        '<span class="cover-card__meta">' + escapeHtml(meta) + '</span>' +
+      '</span>' +
     '</span>' +
-    '<span class="cover-card__title">' + escapeHtml(title) + '</span>' +
-    '<span class="cover-card__sub">' + escapeHtml(sub) + '</span>' +
-    '<span class="cover-card__meta">' + escapeHtml(meta) + '</span>' +
   '</a>';
 }
 
