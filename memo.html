@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Памятка по оказанию первой помощи</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="common.css">
+<script>
+  // тема выбирается до первой отрисовки, чтобы страница не мигала
+  try {
+    var savedTheme = localStorage.getItem("theme.v1");
+    if (!savedTheme) {
+      savedTheme = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark" : "light";
+    }
+    document.documentElement.setAttribute("data-theme", savedTheme);
+  } catch (e) {}
+</script>
+<style>
+  .top-nav { margin-bottom: 16px; }
+
+  /* шапка памятки: логотип и заголовок */
+  .memo-head { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; }
+  .memo-head__icon {
+    width: 56px; height: 56px; flex: 0 0 auto; border-radius: 14px;
+    background: var(--err-soft); color: var(--err);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .memo-head h1 { margin: 0; font-size: 21px; line-height: 1.25; }
+  .memo-head p { margin: 4px 0 0; color: var(--muted); font-size: 13.5px; }
+
+  /* блок «позвонить» */
+  .call {
+    background: var(--surface); border: 1px solid #f2c9c9; border-left: 5px solid var(--err);
+    border-radius: var(--radius); box-shadow: var(--shadow-2);
+    padding: 16px 18px; margin-bottom: 16px;
+  }
+  [data-theme="dark"] .call { border-color: #4a2a2a; border-left-color: var(--err); }
+  .call__label { font-size: 12px; font-weight: 700; letter-spacing: .04em;
+                 text-transform: uppercase; color: var(--err); margin-bottom: 10px; }
+  .call__row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .call__btn {
+    flex: 1 1 200px; display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+    padding: 14px 18px; min-height: 54px; border-radius: var(--radius-sm);
+    background: var(--err); color: #fff; text-decoration: none;
+    font-size: 16px; font-weight: 700; letter-spacing: .01em;
+    box-shadow: 0 6px 16px rgba(217,58,58,.25);
+    transition: transform .14s, box-shadow .15s, background .15s;
+  }
+  .call__btn:hover { background: #c62f2f; transform: translateY(-1px);
+                     box-shadow: 0 10px 22px rgba(217,58,58,.3); }
+  .call__note { margin-top: 10px; font-size: 12.5px; color: var(--muted); }
+
+  /* две колонки как в самой памятке */
+  .memo-grid { display: grid; gap: 14px; margin-bottom: 14px; }
+  @media (min-width: 780px) { .memo-grid { grid-template-columns: 1fr 1fr; } }
+
+  .memo-block {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow-1);
+    padding: 16px 18px;
+  }
+  .memo-block__title {
+    margin: 0 0 12px; font-size: 12px; font-weight: 700;
+    letter-spacing: .04em; color: var(--muted);
+  }
+
+  /* шаги с номерами — как оранжевые квадратики в документе */
+  .step { display: flex; gap: 12px; margin-bottom: 12px; }
+  .step__num {
+    width: 22px; height: 22px; flex: 0 0 auto; border-radius: 6px;
+    background: #ea580c; color: #fff; font-size: 13px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .step__text { font-size: 14.5px; line-height: 1.5; }
+
+  .plain { font-size: 14.5px; line-height: 1.55; margin: 0 0 10px; }
+  .plain:last-child { margin-bottom: 0; }
+  .plain--accent { font-weight: 600; }
+
+  .ticks { list-style: none; margin: 0; padding: 0; }
+  .ticks li { position: relative; padding-left: 22px; font-size: 14.5px; margin-bottom: 7px; }
+  .ticks li::before {
+    content: ""; position: absolute; left: 4px; top: 8px;
+    width: 7px; height: 7px; border-radius: 50%; background: var(--accent);
+  }
+  .ticks--warn li::before { background: var(--err); }
+
+  /* сноски и важные плашки */
+  .memo-note {
+    background: var(--surface-2); border-left: 3px solid var(--border-strong);
+    border-radius: 10px; padding: 12px 14px; font-size: 13.5px; line-height: 1.5;
+    color: var(--muted); margin-top: 12px;
+  }
+  .memo-note b { color: var(--text); }
+
+  .sos {
+    background: var(--err-soft); border: 1px solid #f2c9c9; border-left: 5px solid var(--err);
+    border-radius: var(--radius); padding: 16px 18px;
+  }
+  [data-theme="dark"] .sos { border-color: #4a2a2a; border-left-color: var(--err); }
+  .sos__title { font-size: 12px; font-weight: 700; text-transform: uppercase;
+                letter-spacing: .04em; color: var(--err); margin-bottom: 10px; }
+  .sos h3 { margin: 0 0 6px; font-size: 15px; }
+  .sos h3 + p { margin-top: 0; }
+  .sos p { font-size: 14px; line-height: 1.5; margin: 0 0 14px; color: var(--text); }
+  .sos p:last-child { margin-bottom: 0; }
+
+  /* плашка «за 4 минуты» */
+  .deadline {
+    background: var(--warn-soft); border: 1px solid #f0d9a8;
+    border-radius: var(--radius); padding: 16px 18px; margin-bottom: 14px; text-align: center;
+  }
+  [data-theme="dark"] .deadline { border-color: #4a4022; }
+  .deadline__text { font-size: 14.5px; font-weight: 700; color: #8a5a12; letter-spacing: .01em; }
+  [data-theme="dark"] .deadline__text { color: #e0a33f; }
+
+  /* реанимация: крупно главное число */
+  .cpr { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .cpr__big {
+    font-size: 30px; font-weight: 700; color: var(--accent); line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* кнопка «проверить себя» */
+  .memo-test {
+    display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+    background: var(--surface); border: 1px solid var(--border);
+    border-left: 5px solid var(--err); border-radius: var(--radius);
+    box-shadow: var(--shadow-2); padding: 18px 20px; margin-top: 16px;
+  }
+  .memo-test__body { flex: 1 1 240px; min-width: 0; }
+  .memo-test__title { display: block; font-size: 16px; font-weight: 600; }
+  .memo-test__meta { display: block; font-size: 13.5px; color: var(--muted); margin-top: 3px; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-header__inner">
+    <a class="site-brand" href="index.html">
+      <div class="site-logo">✓</div>
+      <div>
+        <div class="site-title">Внешняя оценка знаний</div>
+        <div class="site-subtitle">Тесты по охране труда</div>
+      </div>
+    </a>
+  </div>
+</header>
+
+<main class="page page--hero">
+  <div class="top-nav"><a class="link-back" href="index.html">← На главную</a></div>
+
+  <div class="memo-head">
+    <span class="memo-head__icon" data-icon="aid" data-size="30"></span>
+    <div>
+      <h1>ПАМЯТКА по оказанию первой помощи</h1>
+      <p>(барьер ОЗ.04. Готовность к оказанию первой помощи)</p>
+    </div>
+  </div>
+
+  <p class="plain">При обнаружении пострадавшего при проверке барьера ОЗ.04 *</p>
+
+  <div class="call">
+    <div class="call__label">Оповестить в течение 4 минут</div>
+    <div class="call__row">
+      <a class="call__btn" href="tel:+79125101236">моб. 8-912-510-12-36</a>
+      <a class="call__btn" href="tel:+73467371182">стац. 8(3467) 371-182</a>
+    </div>
+    <div class="call__note">
+      Обеспечить оповещение о происшествии непосредственного руководителя (мастера)/диспетчера
+      ГПН-Хантос по телефону моб. 8-912-510-12-36; стац. 8(3467) 371-182 в течение 4 минут
+      с момента обнаружения пострадавшего/*условного происшествия.
+    </div>
+  </div>
+
+  <div class="memo-grid">
+
+    <div class="memo-block">
+      <h2 class="memo-block__title">Действия очевидца при оповещении</h2>
+
+      <div class="step">
+        <span class="step__num">1</span>
+        <span class="step__text">Удостовериться, что нет угрозы Вам и пострадавшему</span>
+      </div>
+      <div class="step">
+        <span class="step__num">2</span>
+        <span class="step__text">Проверить наличие признаков жизни (сознания, дыхания)</span>
+      </div>
+      <div class="step">
+        <span class="step__num">3</span>
+        <span class="step__text">При отсутствии признаков жизни (сознания, дыхания) у пострадавшего, привлечь внимание / позвать на помощь</span>
+      </div>
+      <div class="step">
+        <span class="step__num">4</span>
+        <span class="step__text">Немедленно оповестить диспетчера ГПН-Хантос по телефону: моб. 8-912-510-12-36, стац. 8(3467) 371-182.</span>
+      </div>
+
+      <h2 class="memo-block__title" style="margin-top:18px;">Сообщить при звонке</h2>
+      <ul class="ticks">
+        <li>обстоятельства и место происшествия;</li>
+        <li>данные пострадавшего (ФИО, должность, организация, возраст), его состояние;</li>
+        <li>свой номер телефона для контакта.</li>
+      </ul>
+
+      <div class="memo-note">
+        * При проверке барьера ОЗ.04 (условное происшествие) при звонке сказать:
+        «Это проверка связи. Подтвердите готовность выезда на объект &lt;название объекта&gt;».
+      </div>
+
+      <p class="plain plain--accent" style="margin-top:14px;">
+        Приступить к оказанию первой помощи пострадавшему (начать сердечно-легочную реанимацию)
+        или позвать работника, готового оказать первую помощь.
+      </p>
+    </div>
+
+    <div>
+      <div class="memo-block" style="margin-bottom:14px;">
+        <h2 class="memo-block__title">ПРИЗНАКИ СЕРДЕЧНО-СОСУДИСТЫХ ЗАБОЛЕВАНИЙ</h2>
+
+        <h3 style="margin:0 0 6px; font-size:15px;">ИНФАРКТ МИОКАРДА</h3>
+        <p class="plain">- тяжесть, жжение, боли в области сердца, левой лопатке, руке; чувство
+          нехватки воздуха; перебои сердечного ритма; чувство страха смерти, тревоги;
+          общая слабость, повышенная потливость, тошнота.</p>
+
+        <h3 style="margin:14px 0 6px; font-size:15px;">ИНСУЛЬТ</h3>
+        <p class="plain">– выраженная головная боль, головокружение; нарушение/ затруднение речи;
+          асимметрия лица (опущение угла рта); нарушение движений в конечностях; резкая потеря
+          памяти или зрения; потеря сознания.</p>
+      </div>
+
+      <div class="sos">
+        <div class="sos__title">! ВАЖНО: первая помощь при данных состояниях</div>
+        <ul class="ticks ticks--warn">
+          <li>сообщить о происшествии диспетчеру СПД и позвать на помощь;</li>
+          <li>не давать двигаться пострадавшему;</li>
+          <li>придать пострадавшему полу сидячее положение (в положении лежа нагрузка на сердце
+            возрастает), успокоить;</li>
+          <li>обеспечить доступ свежего воздуха;</li>
+          <li>снять или расстегнуть стесняющую одежду;</li>
+          <li>не давать лекарственные препараты**;</li>
+          <li>ждать приезда медицинских работников.</li>
+        </ul>
+        <div class="memo-note">
+          **Возможно, дать лекарственные средства, если у пострадавшего ранее были такие симптомы и ему было назначено лечение врачом
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="deadline">
+    <div class="deadline__text">ДЕЙСТВИЯ, УКАЗАННЫЕ В ПП. 1-4, ДОЛЖНЫ БЫТЬ ВЫПОЛНЕНЫ ЗА 4 МИНУТЫ.</div>
+  </div>
+
+  <div class="memo-block">
+    <h2 class="memo-block__title">При отсутствии признаков жизни (сознание, дыхание)
+      приступить к сердечно-легочной реанимации</h2>
+
+    <div class="cpr">
+      <div class="cpr__big">30 : 2</div>
+      <p class="plain" style="margin:0;">
+        Начать закрытый массаж сердца с искусственной вентиляцией легких,
+        30 нажатий на 2 вдоха.
+      </p>
+    </div>
+
+    <ul class="ticks" style="margin-top:14px;">
+      <li>Выполнение непрямого массажа сердца прекратить при появлении признаков жизни
+        (дыхания, сознания) или при передаче пострадавшего бригаде скорой помощи.</li>
+      <li>При появлении признаков жизни (дыхания, сознания) перевести пострадавшего
+        в устойчивое боковое положение и контролировать его состояние до прибытия бригады
+        скорой помощи</li>
+    </ul>
+  </div>
+
+  <div class="memo-test">
+    <span class="memo-test__body">
+      <span class="memo-test__title">Проверьте себя</span>
+      <span class="memo-test__meta">8 вопросов по этой памятке — займёт минуту</span>
+    </span>
+    <a class="btn" href="memo-quiz.html">Пройти проверку</a>
+  </div>
+
+  <div style="text-align:center; margin-top:22px;">
+    <a class="link-chip" href="index.html"><span class="marks" data-icon="home" data-size="16"></span>На главную</a>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="site-footer__inner">
+    <span>Внешняя оценка знаний · тесты по охране труда</span>
+    <span>Памятка ОЗ.04 · первая помощь</span>
+    <span>Версия от 03.10.2026</span>
+  </div>
+</footer>
+
+<script src="common.js"></script>
+</body>
+</html>
