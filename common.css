@@ -78,7 +78,11 @@ body {
   box-shadow: none;
 }
 .site-title { font-size: 17px; font-weight: 700; letter-spacing: -0.01em; color: #fff; }
-.site-subtitle { font-size: 13px; color: #d9e6ff; }
+.site-subtitle {
+  font-size: 13px; color: #d9e6ff;
+  margin-top: -3px;      /* подпись чуть выше, ближе к заголовку */
+  line-height: 1.25;
+}
 
 /* ===== подвал ===== */
 .site-footer {
