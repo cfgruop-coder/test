@@ -339,42 +339,51 @@ async function loadTests() {
 
       '</div>' +
 
-      '<a class="acc-item memo-row" href="memo.html">' +
+      '<a class="acc-item row-link" href="memo.html" style="--from:#ef5350;--to:#8e1c1c">' +
         '<span class="acc-header">' +
-          '<span class="acc-header__icon" data-icon="aid" data-size="21"></span>' +
-          '<span class="memo-row__body">' +
-            '<span class="memo-row__title">Памятка по оказанию первой помощи</span>' +
-            '<span class="memo-row__meta">Барьер ОЗ.04 · что делать за первые 4 минуты</span>' +
+          '<span class="row-link__icon"><img src="icon-memo.png" alt="" width="64" height="64"></span>' +
+          '<span class="row-link__body">' +
+            '<span class="row-link__title">Памятка по первой помощи</span>' +
+            '<span class="row-link__meta">Барьер ОЗ.04</span>' +
           '</span>' +
-          '<span class="card-link__chev">›</span>' +
+          '<span class="card-link__chev">\u203a</span>' +
         '</span>' +
       '</a>' +
 
       '<div class="section-rows">' +
 
-        '<a class="acc-item row-link" href="professions.html" style="--acc:#1f6feb;--acc-soft:#eaf1fe">' +
+        '<a class="acc-item row-link" href="professions.html" style="--from:#5b9bff;--to:#12356e">' +
           '<span class="acc-header">' +
-            '<span class="acc-header__icon" data-icon="helmet" data-size="21"></span>' +
-            '<span>Тесты по профессии</span>' +
-            '<span class="acc-header__count">' + professions.length + '</span>' +
+            '<span class="row-link__icon"><img src="icon-professions.png" alt="" width="64" height="64"></span>' +
+            '<span class="row-link__body">' +
+              '<span class="row-link__title">Тесты по профессии</span>' +
+              '<span class="row-link__meta">' + professions.length + ' ' +
+                plural(professions.length, "должность", "должности", "должностей") + '</span>' +
+            '</span>' +
             '<span class="card-link__chev">\u203a</span>' +
           '</span>' +
         '</a>' +
 
-        '<a class="acc-item row-link" href="works.html" style="--acc:#0891b2;--acc-soft:#e2f5fa">' +
+        '<a class="acc-item row-link" href="works.html" style="--from:#38bdf8;--to:#0b4a5c">' +
           '<span class="acc-header">' +
-            '<span class="acc-header__icon" data-icon="clipboard" data-size="21"></span>' +
-            '<span>Тесты по видам работ</span>' +
-            '<span class="acc-header__count">' + works.length + '</span>' +
+            '<span class="row-link__icon"><img src="icon-works.png" alt="" width="64" height="64"></span>' +
+            '<span class="row-link__body">' +
+              '<span class="row-link__title">Тесты по видам работ</span>' +
+              '<span class="row-link__meta">' + works.length + ' ' +
+                plural(works.length, "блок", "блока", "блоков") + ' · ' + totalTickets + ' ' +
+                plural(totalTickets, "билет", "билета", "билетов") + '</span>' +
+            '</span>' +
             '<span class="card-link__chev">\u203a</span>' +
           '</span>' +
         '</a>' +
 
-        '<a class="acc-item row-link" href="blitz.html" style="--acc:#ea580c;--acc-soft:#feece3">' +
+        '<a class="acc-item row-link" href="blitz.html" style="--from:#fb923c;--to:#7c2d12">' +
           '<span class="acc-header">' +
-            '<span class="acc-header__icon" data-icon="bolt" data-size="21"></span>' +
-            '<span>Блиц-опрос</span>' +
-            '<span class="acc-header__count">' + (works.length + professions.length) + '</span>' +
+            '<span class="row-link__icon"><img src="icon-blitz.png" alt="" width="64" height="64"></span>' +
+            '<span class="row-link__body">' +
+              '<span class="row-link__title">Блиц-опрос</span>' +
+              '<span class="row-link__meta">' + (works.length + professions.length) + ' вариантов</span>' +
+            '</span>' +
             '<span class="card-link__chev">\u203a</span>' +
           '</span>' +
         '</a>' +
