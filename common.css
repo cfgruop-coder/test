@@ -684,6 +684,9 @@ body {
 .section-rows { display: flex; flex-direction: column; gap: 12px; }
 .row-link { display: block; text-decoration: none; color: inherit; }
 
+/* верхняя ссылка-назад на внутренних страницах */
+.top-nav { margin-bottom: 16px; }
+
 /* ===== обложки разделов: только на широком экране =====
    На телефоне и планшете ничего не меняется — там прежние строки разделов. */
 .covers { display: none; }

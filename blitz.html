@@ -18,7 +18,6 @@
   } catch (e) {}
 </script>
 <style>
-  .top-nav { margin-bottom: 16px; }
 
   /* ===== таймер ===== */
   .timer { margin: 10px 0 16px; }
@@ -80,7 +79,7 @@
 </header>
 
 <main class="page page--wide">
-  <div class="top-nav"><a class="link-back" href="index.html">← На главную</a></div>
+  <div class="top-nav"><a class="link-chip" href="index.html"><span class="marks" data-icon="home" data-size="16"></span>На главную</a></div>
   <div id="app">
     <div class="loading">Загрузка…</div>
   </div>
@@ -165,7 +164,7 @@ function renderPicker(tests) {
 
   const app = document.getElementById("app");
   app.innerHTML =
-    '<div style="margin-bottom:14px;"><a class="link-back" href="index.html">\u2190 На главную</a></div>' +
+    '<div class="top-nav"><a class="link-chip" href="index.html"><span class="marks" data-icon="home" data-size="16"></span>На главную</a></div>' +
     '<h1 class="page-title">Блиц-опрос</h1>' +
     '<p class="page-sub">Выберите, по чему проверить себя: 15 секунд на вопрос и без подготовки</p>' +
     '<div id="pickWorks"></div><div id="pickProfs"></div>';
@@ -670,7 +669,7 @@ function renderFinal() {
 
       '<div class="final-buttons">' +
         '<button class="btn" id="againBtn">Пройти ещё раз</button>' +
-        '<button class="btn btn--secondary" id="homeBtn">На главную</button>' +
+        '<button class="btn btn--secondary" id="homeBtn"><span class="marks">' + uiIcon("home", 17) + '</span>На главную</button>' +
       '</div>' +
     '</div>';
 
@@ -688,7 +687,7 @@ function showError(msg) {
     '<div class="error">' +
       '<h2>Не получилось</h2>' +
       '<p>' + escapeHtml(msg) + '</p>' +
-      '<p><a class="link-back" href="index.html">Вернуться на главную</a></p>' +
+      '<p><a class="link-chip" href="index.html"><span class="marks">' + uiIcon("home", 16) + '</span>На главную</a></p>' +
     '</div>';
 }
 
