@@ -742,5 +742,7 @@ body {
 
 @media (min-width: 900px) {
   .covers { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; row-gap: 22px; }
-  .row-link, .section-rows { display: none; }   /* прежние разделы прячем — их заменяют обложки */
+  /* селектор такой же специфичности, как правило градиента,
+     иначе строка памятки остаётся видимой */
+  a.acc-item.row-link, .section-rows { display: none; }   /* прежние разделы прячем — их заменяют обложки */
 }
