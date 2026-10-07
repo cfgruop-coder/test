@@ -27,7 +27,7 @@
   },
   {
     "id": "excavator",
-    "title": "Машинист экскаватора",
+    "title": "Машинист тяжёлой техники",
     "group": "profession",
     "parts": [
       { "topic": "zr", "count": 23, "passPercent": 40 },

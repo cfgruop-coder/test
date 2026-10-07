@@ -43,7 +43,7 @@ const HELMET_COLORS = {
 const PROFESSION_HELMETS = {
   svar: "orange",       // Электрогазосварщик
   master: "white",      // Мастер СМР
-  excavator: "blue",    // Машинист экскаватора
+  excavator: "blue",    // Машинист тяжёлой техники
   crane: "blue",        // Машинист Автокрана/АГП
   kmu: "blue"           // Машинист КМУ
 };
