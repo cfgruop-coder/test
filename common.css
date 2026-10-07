@@ -679,3 +679,40 @@ body {
 [data-theme="dark"] .link-chip { background: var(--surface); }
 [data-theme="dark"] .stat,
 [data-theme="dark"] .filter-chip { background: var(--surface); }
+
+/* строки разделов на телефоне: те же размеры, что у строк аккордеона */
+.section-rows { display: flex; flex-direction: column; gap: 12px; }
+.row-link { display: block; text-decoration: none; color: inherit; }
+
+/* ===== обложки разделов: только на широком экране =====
+   На телефоне и планшете ничего не меняется — там прежние строки разделов. */
+.covers { display: none; }
+
+.cover-card { display: block; text-decoration: none; color: inherit; }
+.cover-card__img {
+  position: relative; display: block;
+  border-radius: 12px; overflow: hidden;
+  background: var(--surface-2); box-shadow: var(--shadow-2);
+  transition: transform .15s, box-shadow .15s;
+}
+.cover-card:hover .cover-card__img { transform: translateY(-2px); box-shadow: var(--shadow-3); }
+.cover-card__img img {
+  display: block; width: 100%; height: auto;
+  image-rendering: pixelated;   /* пиксельные обложки не размываются */
+}
+.cover-card__badge {
+  position: absolute; left: 10px; top: 10px;
+  padding: 3px 10px; border-radius: 8px;
+  background: #1e9e5a; color: #fff;
+  font-size: 14px; font-weight: 700; line-height: 1.35;
+}
+.cover-card__title { display: block; margin-top: 12px; font-size: 15.5px; font-weight: 700; }
+.cover-card__sub, .cover-card__meta { display: block; font-size: 12.5px; color: var(--muted); }
+.cover-card__sub { margin-top: 3px; }
+.cover-card__meta { margin-top: 2px; }
+.cover-card__go { display: block; margin-top: 9px; font-size: 13px; font-weight: 600; color: var(--accent); }
+
+@media (min-width: 900px) {
+  .covers { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; row-gap: 22px; }
+  .memo-row, .section-rows { display: none; }   /* прежние разделы прячем — их заменяют обложки */
+}

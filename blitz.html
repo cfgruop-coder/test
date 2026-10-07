@@ -130,6 +130,72 @@ function loadTopicQuestions(topic) {
   });
 }
 
+// Список для выбора: по какому блоку или профессии устроить блиц
+function renderPicker(tests) {
+  const works = tests.filter(function (t) { return (t.group || "profession") === "work"; });
+  const professions = tests.filter(function (t) { return (t.group || "profession") === "profession"; });
+
+  function card(title, meta, iconHtml, href, info) {
+    const a = document.createElement("a");
+    a.className = "card-link" + (info ? " card-link--block" : "");
+    a.href = href;
+
+    if (info) {
+      a.style.setProperty("--block", info.color);
+      a.style.setProperty("--block-soft", info.soft);
+    }
+
+    a.innerHTML =
+      '<span class="card-link__icon">' + iconHtml + '</span>' +
+      '<span class="card-link__body"><span class="card-link__title"></span>' +
+        '<span class="card-link__meta"></span></span>' +
+      '<span class="card-link__chev">\u203a</span>';
+
+    a.querySelector(".card-link__title").textContent = title;
+    a.querySelector(".card-link__meta").textContent = meta;
+    return a;
+  }
+
+  function group(text) {
+    const el = document.createElement("div");
+    el.className = "blitz-group";
+    el.textContent = text;
+    return el;
+  }
+
+  const app = document.getElementById("app");
+  app.innerHTML =
+    '<div style="margin-bottom:14px;"><a class="link-back" href="index.html">\u2190 На главную</a></div>' +
+    '<h1 class="page-title">Блиц-опрос</h1>' +
+    '<p class="page-sub">Выберите, по чему проверить себя: 15 секунд на вопрос и без подготовки</p>' +
+    '<div id="pickWorks"></div><div id="pickProfs"></div>';
+
+  const worksBox = document.getElementById("pickWorks");
+  worksBox.appendChild(group("По видам работ"));
+  const workList = document.createElement("div");
+  workList.className = "card-list";
+  works.forEach(function (t) {
+    const info = blockInfo(t.topic);
+    workList.appendChild(card(t.title, "Блиц по этому блоку", info.icon,
+      "blitz.html?block=" + encodeURIComponent(t.id), info));
+  });
+  worksBox.appendChild(workList);
+
+  const profBox = document.getElementById("pickProfs");
+  profBox.appendChild(group("По профессиям"));
+  const profList = document.createElement("div");
+  profList.className = "card-list";
+  professions.forEach(function (t) {
+    profList.appendChild(card(t.title, "Блиц по блокам профессии",
+      workerIcon(PROFESSION_HELMETS[t.id]),
+      "blitz.html?prof=" + encodeURIComponent(t.id)));
+  });
+  profBox.appendChild(profList);
+
+  document.title = "Блиц-опрос";
+  fillIcons(app);
+}
+
 async function boot() {
   const params = new URLSearchParams(location.search);
   const blockId = params.get("block");
@@ -153,11 +219,9 @@ async function boot() {
       if (!test) throw new Error("Блок не найден: " + blockId);
       source = { kind: "block", title: test.title, topics: [{ topic: test.topic, weight: 1 }] };
     } else {
-      source = {
-        kind: "all",
-        title: "Все виды работ",
-        topics: Object.keys(BLOCKS).map(function (t) { return { topic: t, weight: 1 }; })
-      };
+      // без параметров показываем список: по чему устроить блиц
+      renderPicker(tests);
+      return;
     }
 
     const topics = source.topics.map(function (t) { return t.topic; });

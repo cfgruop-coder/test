@@ -148,6 +148,20 @@ function renderQuick(works, counts) {
   row.appendChild(blitz);
 }
 
+// карточка-обложка раздела: видна только на широком экране
+function coverCard(img, badge, title, sub, meta, href) {
+  return '<a class="cover-card" href="' + href + '">' +
+    '<span class="cover-card__img">' +
+      '<img src="' + img + '" alt="" width="256" height="336" loading="lazy">' +
+      '<span class="cover-card__badge">' + badge + '</span>' +
+    '</span>' +
+    '<span class="cover-card__title">' + escapeHtml(title) + '</span>' +
+    '<span class="cover-card__sub">' + escapeHtml(sub) + '</span>' +
+    '<span class="cover-card__meta">' + escapeHtml(meta) + '</span>' +
+    '<span class="cover-card__go">Начать →</span>' +
+  '</a>';
+}
+
 // «Продолжить» — последний открытый билет
 function renderContinue() {
   const slot = document.getElementById("continueSlot");
@@ -305,6 +319,26 @@ async function loadTests() {
           plural(totalTopics, "тема", "темы", "тем") + '</span></div>' +
       '</div>' +
 
+      '<div class="covers">' +
+
+        coverCard("cover-memo.png", "4 мин", "Памятка по первой помощи", "Барьер ОЗ.04",
+          "8 вопросов для проверки", "memo.html") +
+
+        coverCard("cover-professions.png", professions.length, "Тесты по профессии",
+          professions.length + " " + plural(professions.length, "должность", "должности", "должностей"),
+          "50 вопросов в каждом", "professions.html") +
+
+        coverCard("cover-works.png", totalTickets, "Тесты по видам работ",
+          works.length + " " + plural(works.length, "блок", "блока", "блоков"),
+          plural(totalTickets, "билет", "билета", "билетов") + " · " +
+            totalQuestions + " " + plural(totalQuestions, "вопрос", "вопроса", "вопросов"),
+          "works.html") +
+
+        coverCard("cover-blitz.png", works.length + professions.length, "Блиц-опрос", "на время",
+          "20, 50 или 100 вопросов", "blitz.html") +
+
+      '</div>' +
+
       '<a class="acc-item memo-row" href="memo.html">' +
         '<span class="acc-header">' +
           '<span class="acc-header__icon" data-icon="aid" data-size="21"></span>' +
@@ -316,63 +350,40 @@ async function loadTests() {
         '</span>' +
       '</a>' +
 
-      '<div class="accordion">' +
+      '<div class="section-rows">' +
 
-        '<div class="acc-item" style="--acc:#1f6feb;--acc-soft:#eaf1fe">' +
-          '<button type="button" class="acc-header" data-target="panel-profession" aria-expanded="false">' +
+        '<a class="acc-item row-link" href="professions.html" style="--acc:#1f6feb;--acc-soft:#eaf1fe">' +
+          '<span class="acc-header">' +
             '<span class="acc-header__icon" data-icon="helmet" data-size="21"></span>' +
             '<span>Тесты по профессии</span>' +
             '<span class="acc-header__count">' + professions.length + '</span>' +
-            '<span class="acc-arrow">▼</span>' +
-          '</button>' +
-          '<div class="acc-panel" id="panel-profession">' +
-            '<div class="acc-panel__inner"><div class="card-list" id="professionList"></div></div>' +
-          '</div>' +
-        '</div>' +
+            '<span class="card-link__chev">\u203a</span>' +
+          '</span>' +
+        '</a>' +
 
-        '<div class="acc-item" style="--acc:#0891b2;--acc-soft:#e2f5fa">' +
-          '<button type="button" class="acc-header" data-target="panel-work" aria-expanded="false">' +
+        '<a class="acc-item row-link" href="works.html" style="--acc:#0891b2;--acc-soft:#e2f5fa">' +
+          '<span class="acc-header">' +
             '<span class="acc-header__icon" data-icon="clipboard" data-size="21"></span>' +
             '<span>Тесты по видам работ</span>' +
             '<span class="acc-header__count">' + works.length + '</span>' +
-            '<span class="acc-arrow">▼</span>' +
-          '</button>' +
-          '<div class="acc-panel" id="panel-work">' +
-            '<div class="acc-panel__inner"><div class="card-list" id="workList"></div></div>' +
-          '</div>' +
-        '</div>' +
+            '<span class="card-link__chev">\u203a</span>' +
+          '</span>' +
+        '</a>' +
 
-        '<div class="acc-item" style="--acc:#ea580c;--acc-soft:#feece3">' +
-          '<button type="button" class="acc-header" data-target="panel-blitz" aria-expanded="false">' +
+        '<a class="acc-item row-link" href="blitz.html" style="--acc:#ea580c;--acc-soft:#feece3">' +
+          '<span class="acc-header">' +
             '<span class="acc-header__icon" data-icon="bolt" data-size="21"></span>' +
             '<span>Блиц-опрос</span>' +
             '<span class="acc-header__count">' + (works.length + professions.length) + '</span>' +
-            '<span class="acc-arrow">▼</span>' +
-          '</button>' +
-          '<div class="acc-panel" id="panel-blitz">' +
-            '<div class="acc-panel__inner"><div id="blitzList"></div></div>' +
-          '</div>' +
-        '</div>' +
+            '<span class="card-link__chev">\u203a</span>' +
+          '</span>' +
+        '</a>' +
 
       '</div>';
 
-    renderList("professionList", professions, function (t) {
-      return "test.html?id=" + encodeURIComponent(t.id);
-    }, function (t) {
-      return workerIcon(PROFESSION_HELMETS[t.id]);
-    });
-
-    renderList("workList", works, function (t) {
-      return "block.html?id=" + encodeURIComponent(t.id);
-    }, function () {
-      return uiIcon("clipboard", 20);
-    });
-
-    initAccordion();
     fillIcons(app);
     renderQuick(works, counts);
     renderContinue();
-    renderBlitz(works, professions);
     renderResetLink();
 
   } catch (e) {
