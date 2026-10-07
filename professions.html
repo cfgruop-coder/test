@@ -5,16 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Тесты по профессии</title>
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="common.css?v=4">
+<link rel="stylesheet" href="common.css?v=6">
 <script>
   // тема выбирается до первой отрисовки, чтобы страница не мигала
   try {
     var savedTheme = localStorage.getItem("theme.v1");
-    if (!savedTheme) {
-      savedTheme = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches
-        ? "dark" : "light";
-    }
-    document.documentElement.setAttribute("data-theme", savedTheme);
+    // светлая тема по умолчанию; тёмная — только если её выбрал сам пользователь
+    document.documentElement.setAttribute("data-theme", savedTheme === "dark" ? "dark" : "light");
   } catch (e) {}
 </script>
 </head>
@@ -52,7 +49,7 @@
   </div>
 </footer>
 
-<script src="common.js"></script>
+<script src="common.js?v=6"></script>
 <script>
 // карточка профессии: иконка-каска, название и число вопросов
 function card(title, meta, iconHtml, href) {
