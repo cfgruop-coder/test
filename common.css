@@ -70,11 +70,12 @@ body {
 }
 .site-logo {
   width: 40px; height: 40px; flex: 0 0 auto;
-  border-radius: 11px;
-  /* своя иконка сайта: круг с градиентом и бланк теста */
-  background: url("logo.png?v=1") center / contain no-repeat;
+  border-radius: 12px;
+  /* иконка сайта на белой подложке: так она не сливается с синей шапкой,
+     а вокруг круга остаётся светлый ободок */
+  background: #ffffff url("logo.png?v=2") center / 76% no-repeat;
   color: transparent; font-size: 0;
-  box-shadow: none;
+  box-shadow: 0 1px 3px rgba(12, 40, 90, .22);
 }
 .site-title { font-size: 17px; font-weight: 700; letter-spacing: -0.01em; color: #fff; }
 .site-subtitle { font-size: 13px; color: #d9e6ff; }
