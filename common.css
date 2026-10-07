@@ -211,11 +211,16 @@ body {
 
 /* ===== мелочи ===== */
 .blitz-group {
-  font-size: 11.5px; font-weight: 600; text-transform: uppercase;
-  letter-spacing: .04em; color: var(--muted);
-  margin: 16px 0 8px; padding-left: 2px;
+  display: flex; align-items: center; gap: 10px;
+  font-size: 12.5px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .05em; color: var(--text);
+  margin: 0 0 10px;
 }
-.blitz-group:first-child { margin-top: 4px; }
+/* тонкая линия после заголовка — он читается как начало раздела */
+.blitz-group::after { content: ""; flex: 1 1 auto; height: 1px; background: var(--border); }
+
+/* второй список отбиваем от первого, иначе заголовок липнет к карточке */
+#pickProfs { margin-top: 28px; }
 .loading, .empty { text-align: center; padding: 22px; color: var(--muted); font-size: 14.5px; }
 .error-box {
   background: var(--surface); border: 1.5px solid #f4c7c7; border-radius: var(--radius);
