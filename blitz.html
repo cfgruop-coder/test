@@ -130,9 +130,18 @@ function loadTopicQuestions(topic) {
 }
 
 // Список для выбора: по какому блоку или профессии устроить блиц
-function renderPicker(tests) {
+async function renderPicker(tests) {
+  const counts = await fetchJson("counts.json");
+
   const works = tests.filter(function (t) { return (t.group || "profession") === "work"; });
   const professions = tests.filter(function (t) { return (t.group || "profession") === "profession"; });
+
+  function questionsIn(test) {
+    if (test.parts) {
+      return test.parts.reduce(function (sum, p) { return sum + p.count; }, 0);
+    }
+    return counts.counts[test.topic] || 0;
+  }
 
   function card(title, meta, iconHtml, href, info) {
     const a = document.createElement("a");
@@ -164,7 +173,6 @@ function renderPicker(tests) {
 
   const app = document.getElementById("app");
   app.innerHTML =
-    '<div class="top-nav"><a class="link-chip" href="index.html"><span class="marks" data-icon="home" data-size="16"></span>На главную</a></div>' +
     '<h1 class="page-title">Блиц-опрос</h1>' +
     '<p class="page-sub">Выберите, по чему проверить себя: 15 секунд на вопрос и без подготовки</p>' +
     '<div id="pickWorks"></div><div id="pickProfs"></div>';
@@ -175,7 +183,7 @@ function renderPicker(tests) {
   workList.className = "card-list";
   works.forEach(function (t) {
     const info = blockInfo(t.topic);
-    workList.appendChild(card(t.title, "Блиц по этому блоку", info.icon,
+    workList.appendChild(card(t.title, questionsWord(questionsIn(t)), info.icon,
       "blitz.html?block=" + encodeURIComponent(t.id), info));
   });
   worksBox.appendChild(workList);
@@ -185,7 +193,7 @@ function renderPicker(tests) {
   const profList = document.createElement("div");
   profList.className = "card-list";
   professions.forEach(function (t) {
-    profList.appendChild(card(t.title, "Блиц по блокам профессии",
+    profList.appendChild(card(t.title, questionsWord(questionsIn(t)),
       workerIcon(PROFESSION_HELMETS[t.id]),
       "blitz.html?prof=" + encodeURIComponent(t.id)));
   });
@@ -219,7 +227,7 @@ async function boot() {
       source = { kind: "block", title: test.title, topics: [{ topic: test.topic, weight: 1 }] };
     } else {
       // без параметров показываем список: по чему устроить блиц
-      renderPicker(tests);
+      await renderPicker(tests);
       return;
     }
 
