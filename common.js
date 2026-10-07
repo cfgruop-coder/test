@@ -10,7 +10,7 @@ const BLOCKS = {
   or:  { title: "Огневые работы",                      icon: "🔥", color: "#ea580c", soft: "#feece3" },
   prr: { title: "Погрузо-разгрузочные работы",         icon: "📦", color: "#2563eb", soft: "#e8f0fe" },
   pb:  { title: "Пожарная безопасность",               icon: "🧯", color: "#dc2626", soft: "#fdeaea" },
-  rv:  { title: "Работы на высоте",                    icon: "🪜", color: "#0891b2", soft: "#e2f5fa" },
+  rv:  { title: "Работы на высоте",                    icon: "🧗", color: "#0891b2", soft: "#e2f5fa" },
   egs: { title: "Электросварочные и газосварочные работы", icon: "⚡", color: "#7c3aed", soft: "#f1eafe" },
   zr:  { title: "Земляные работы",                     icon: "🚜", color: "#65a30d", soft: "#eef7dd" }
 };
