@@ -458,6 +458,8 @@ body {
   transition: background .15s;
 }
 .theme-toggle:hover { background: rgba(255,255,255,.28); }
+/* кнопка установки приложения: стоит справа от переключателя темы */
+.install-btn { margin-left: 0; }
 
 /* при работе с клавиатуры видно, где находишься */
 :focus-visible { outline: 2.5px solid var(--accent); outline-offset: 2px; border-radius: 10px; }

@@ -60,6 +60,7 @@ const UI_ICONS = {
   cross: [["M18.4 7.2 L16.8 5.6 12 10.4 7.2 5.6 5.6 7.2 10.4 12 5.6 16.8 7.2 18.4 12 13.6 16.8 18.4 18.4 16.8 13.6 12 z", false]],
   plus: [["M10.9 4.6 h2.2 v6.3 h6.3 v2.2 h-6.3 v6.3 h-2.2 v-6.3 H4.6 v-2.2 h6.3 z", false]],
   dice: [["M4 4 h16 v16 H4 z", false], ["M7.2 7.2 h2.4 v2.4 H7.2 z", true], ["M14.4 7.2 h2.4 v2.4 h-2.4 z", true], ["M10.8 10.8 h2.4 v2.4 h-2.4 z", true], ["M7.2 14.4 h2.4 v2.4 H7.2 z", true], ["M14.4 14.4 h2.4 v2.4 h-2.4 z", true]],
+  download: [["M11 3h2v7h3.2l-4.2 5-4.2-5H11z", false], ["M5 17.4h14V2.6H5z", true], ["M5 17.4h14V20H5z", false]],
   sun: [["M16.60 12.00 C16.60 13.99 15.32 15.76 13.42 16.37 C11.53 16.99 9.45 16.32 8.28 14.70 C7.11 13.09 7.11 10.91 8.28 9.30 C9.45 7.68 11.53 7.01 13.42 7.63 C15.32 8.24 16.60 10.01 16.60 12.00 Z", false], ["M10.9 1.4 h2.2 v3.8 h-2.2 z", false], ["M10.9 18.8 h2.2 v3.8 h-2.2 z", false], ["M1.4 10.9 h3.8 v2.2 H1.4 z", false], ["M18.8 10.9 h3.8 v2.2 h-3.8 z", false], ["M3.8 5.5 l1.7 -1.7 2.7 2.7 -1.7 1.7 z", false], ["M15.8 17.5 l1.7 -1.7 2.7 2.7 -1.7 1.7 z", false], ["M18.5 3.8 l1.7 1.7 -2.7 2.7 -1.7 -1.7 z", false], ["M6.5 15.8 l1.7 1.7 -2.7 2.7 -1.7 -1.7 z", false]],
   moon: [["M20.60 12.00 C20.60 15.73 18.20 19.03 14.66 20.18 C11.11 21.33 7.23 20.07 5.04 17.05 C2.85 14.04 2.85 9.96 5.04 6.95 C7.23 3.93 11.11 2.67 14.66 3.82 C18.20 4.97 20.60 8.27 20.60 12.00 Z", false], ["M23.20 10.40 C23.20 13.78 21.02 16.77 17.81 17.82 C14.60 18.86 11.08 17.72 9.09 14.98 C7.10 12.25 7.10 8.55 9.09 5.82 C11.08 3.08 14.60 1.94 17.81 2.98 C21.02 4.03 23.20 7.02 23.20 10.40 Z", true]],
   // первая помощь: щит с крестом (выбор заказчика)
@@ -365,4 +366,62 @@ if (document.readyState === "loading") {
 } else {
   initTheme();
   fillIcons();
+}
+
+// ---------- приложение на телефон: оффлайн-режим ----------
+
+let installPrompt = null;
+
+function initInstall() {
+  // служебный файл сохраняет сайт в память устройства
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("sw.js").catch(function () {});
+  }
+
+  const header = document.querySelector(".site-header__inner");
+  if (!header || document.getElementById("installApp")) return;
+
+  const standalone = window.matchMedia("(display-mode: standalone)").matches ||
+                     window.navigator.standalone === true;
+  const isiOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.id = "installApp";
+  btn.className = "theme-toggle install-btn";
+  btn.innerHTML = uiIcon("download", 18);
+  btn.title = "Установить приложение";
+  btn.setAttribute("aria-label", btn.title);
+  btn.hidden = true;
+
+  btn.addEventListener("click", function () {
+    if (installPrompt) {
+      installPrompt.prompt();
+      installPrompt.userChoice.then(function () {
+        installPrompt = null;
+        btn.hidden = true;
+      });
+      return;
+    }
+    alert("На айфоне приложение ставится так:\n\n«Поделиться» → «На экран Домой»");
+  });
+
+  window.addEventListener("beforeinstallprompt", function (e) {
+    e.preventDefault();          // окно само не показываем — только по кнопке
+    installPrompt = e;
+    if (!standalone) btn.hidden = false;
+  });
+
+  window.addEventListener("appinstalled", function () { btn.hidden = true; });
+
+  // на айфоне системного окна нет — показываем кнопку с подсказкой
+  if (isiOS && !standalone) btn.hidden = false;
+
+  header.appendChild(btn);
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initInstall);
+} else {
+  initInstall();
 }
