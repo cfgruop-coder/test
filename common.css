@@ -774,3 +774,6 @@ body {
   background-size: 220px 84px, 100% 100%;
   box-shadow: 0 2px 14px rgba(0, 0, 0, .38);
 }
+
+/* в тёмной теме иконка светлее и без заливки — не спорит с тёмной шапкой */
+[data-theme="dark"] .site-logo { background-image: url("logo-dark.png?v=1"); }
