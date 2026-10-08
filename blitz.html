@@ -85,8 +85,6 @@
 <footer class="site-footer">
   <div class="site-footer__inner">
     <span>SFGroup - тестирование · тесты по охране труда</span>
-    <span>Иконки профессий: Twemoji (CC-BY 4.0)</span>
-    <span>Версия от 03.10.2026</span>
   </div>
 </footer>
 
@@ -191,7 +189,7 @@ async function renderPicker(tests) {
   profList.className = "card-list";
   professions.forEach(function (t) {
     profList.appendChild(card(t.title, questionsWord(questionsIn(t)),
-      workerIcon(PROFESSION_HELMETS[t.id]),
+      workerIcon(t.id),
       "blitz.html?prof=" + encodeURIComponent(t.id)));
   });
   profBox.appendChild(profList);

@@ -45,7 +45,6 @@
 <footer class="site-footer">
   <div class="site-footer__inner">
     <span>SFGroup - тестирование · тесты по охране труда</span>
-    <span>Версия от 03.10.2026</span>
   </div>
 </footer>
 
@@ -80,7 +79,7 @@ async function load() {
     box.appendChild(card(
       t.title,
       count + " " + plural(count, "вопрос", "вопроса", "вопросов"),
-      workerIcon(PROFESSION_HELMETS[t.id]),
+      workerIcon(t.id),
       "test.html?id=" + encodeURIComponent(t.id)
     ));
   });
