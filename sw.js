@@ -1,7 +1,7 @@
 /* Оффлайн-копия сайта: складываем файлы в память устройства.
    При обновлении сайта меняем номер версии ниже — тогда у людей
    подтянется свежая копия. */
-const CACHE = "sfgroup-v1";
+const CACHE = "sfgroup-v2";
 
 const FILES = [
   "./", "index.html", "block.html", "test.html", "blitz.html",
@@ -17,7 +17,10 @@ const FILES = [
 
 self.addEventListener("install", function (e) {
   e.waitUntil(caches.open(CACHE).then(function (c) {
-    return c.addAll(FILES);
+    // каждый файл кладём отдельно: если один не найдётся, остальные сохранятся
+    return Promise.all(FILES.map(function (f) {
+      return c.add(f).catch(function () {});
+    }));
   }).then(function () { return self.skipWaiting(); }));
 });
 
@@ -28,16 +31,31 @@ self.addEventListener("activate", function (e) {
   }).then(function () { return self.clients.claim(); }));
 });
 
+/* Сначала сеть — сайт всегда свежий, когда есть интернет.
+   Нет интернета — отдаём копию из памяти. Поиск идёт без учёта параметров
+   адреса, поэтому test.html?prof=... и common.css?v=9 находят свои файлы. */
 self.addEventListener("fetch", function (e) {
   const req = e.request;
-  if (req.method !== "GET" || new URL(req.url).origin !== location.origin) return;
+  let url;
+  try {
+    url = new URL(req.url);
+  } catch (err) {
+    return;
+  }
+  if (req.method !== "GET" || url.origin !== location.origin) return;
 
-  e.respondWith(caches.match(req).then(function (hit) {
-    if (hit) return hit;
-    return fetch(req).then(function (res) {
-      const copy = res.clone();
-      caches.open(CACHE).then(function (c) { c.put(req, copy); });
+  e.respondWith(
+    fetch(req).then(function (res) {
+      if (res && res.ok) {
+        const copy = res.clone();
+        caches.open(CACHE).then(function (c) { c.put(req, copy); });
+      }
       return res;
-    }).catch(function () { return caches.match("index.html"); });
-  }));
+    }).catch(function () {
+      return caches.match(req, { ignoreSearch: true }).then(function (hit) {
+        if (hit) return hit;
+        return caches.match("index.html");
+      });
+    })
+  );
 });
