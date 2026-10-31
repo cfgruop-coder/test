@@ -477,7 +477,7 @@ function initSearchPage() {
     if (!bank) return;
     const q = input.value.trim().toLowerCase();
     if (!q) {
-      count.textContent = "Начните печатать — поиск идёт по всем 977 вопросам";
+      count.textContent = "";
       list.innerHTML = "";
       return;
     }
