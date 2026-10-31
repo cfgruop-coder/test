@@ -857,3 +857,9 @@ body {
   box-shadow: inset 0 0 0 1.5px rgba(52,199,123,.60);
   color: #d9f7e5;
 }
+
+/* кнопка «Показать ответ» — с воздухом от текста вопроса */
+.search-card__btn { margin-top: 12px; transition: background .15s; }
+.search-card__btn:hover { background: rgba(31,111,235,.18); }
+.search-card__q { letter-spacing: -.01em; }
+.search-card { padding: 14px 16px 16px; }
