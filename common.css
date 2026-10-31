@@ -831,3 +831,6 @@ body {
   .site-title { font-size: 16px; }
   .site-subtitle { font-size: 12px; margin-top: -2px; }
 }
+
+/* скрытые ответы действительно скрыты (стиль перебивал атрибут hidden) */
+.search-card__answers[hidden] { display: none; }

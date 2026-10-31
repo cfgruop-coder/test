@@ -488,7 +488,7 @@ function initSearchPage() {
     });
 
     count.textContent = found.length
-      ? "Найдено " + found.length + " " + questionsWord(found.length)
+      ? "Найдено " + questionsWord(found.length)
       : "Ничего не найдено. Попробуйте другое слово.";
 
     list.innerHTML = "";
