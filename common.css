@@ -819,3 +819,15 @@ body {
 /* лупа в шапке: стоит слева от переключателя темы */
 .search-btn { margin-left: auto; }
 .search-btn + .theme-toggle { margin-left: 0; }
+
+/* ---------- шапка на телефоне: короткое имя и компактные кнопки ---------- */
+.title-short { display: none; }
+.site-brand { min-width: 0; }
+@media (max-width: 600px) {
+  .title-full { display: none; }
+  .title-short { display: inline; }
+  .site-header__inner { gap: 8px; padding: 12px; }
+  .theme-toggle { width: 36px; height: 36px; border-radius: 10px; }
+  .site-title { font-size: 16px; }
+  .site-subtitle { font-size: 12px; margin-top: -2px; }
+}
