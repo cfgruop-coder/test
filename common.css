@@ -834,3 +834,26 @@ body {
 
 /* скрытые ответы действительно скрыты (стиль перебивал атрибут hidden) */
 .search-card__answers[hidden] { display: none; }
+
+/* ---------- поиск: компактнее и заметнее ---------- */
+/* поле ввода видно и на светлом фоне */
+.search-box input { border-color: #c3d2ec; box-shadow: 0 1px 4px rgba(16,40,80,.10); }
+/* страница начинается выше — при вводе видно больше вариантов */
+#searchPage { padding-top: 16px; }
+#searchPage h1 { margin: 0 0 12px; font-size: 24px; }
+.search-box { margin: 10px 0 8px; }
+.search-count { margin: 0 0 8px; }
+.search-results { gap: 8px; }
+.search-card { padding: 12px 14px; }
+/* правильный ответ хорошо виден в светлой теме */
+.search-card__answers li.is-right {
+  background: rgba(30,158,90,.16);
+  box-shadow: inset 0 0 0 1.5px rgba(30,158,90,.45);
+  font-weight: 700;
+}
+/* и в тёмной — ярче, чтобы не сливался */
+[data-theme="dark"] .search-card__answers li.is-right {
+  background: rgba(52,199,123,.24);
+  box-shadow: inset 0 0 0 1.5px rgba(52,199,123,.60);
+  color: #d9f7e5;
+}
