@@ -497,8 +497,6 @@ function initSearchPage() {
       card.className = "search-card";
       card.innerHTML =
         '<div class="search-card__q">' + escapeText(item.question) + "</div>" +
-        '<div class="search-card__meta">' + escapeText(item.topicTitle) +
-          " · вопрос " + (item.number + 1) + " из " + item.total + "</div>" +
         '<button type="button" class="search-card__btn">Показать ответ</button>' +
         '<ul class="search-card__answers" hidden>' +
         item.options.map(function (o) {
