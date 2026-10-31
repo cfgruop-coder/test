@@ -61,6 +61,7 @@ const UI_ICONS = {
   plus: [["M10.9 4.6 h2.2 v6.3 h6.3 v2.2 h-6.3 v6.3 h-2.2 v-6.3 H4.6 v-2.2 h6.3 z", false]],
   dice: [["M4 4 h16 v16 H4 z", false], ["M7.2 7.2 h2.4 v2.4 H7.2 z", true], ["M14.4 7.2 h2.4 v2.4 h-2.4 z", true], ["M10.8 10.8 h2.4 v2.4 h-2.4 z", true], ["M7.2 14.4 h2.4 v2.4 H7.2 z", true], ["M14.4 14.4 h2.4 v2.4 h-2.4 z", true]],
   download: [["M10.8 3h2.4v6.4h3.6L12 15.2 7.2 9.4h3.6z", false], ["M4.6 17.6h14.8V20H4.6z", false]],
+  search: [["M4 10.6 a6.6 6.6 0 1 0 13.2 0 a6.6 6.6 0 1 0 -13.2 0 Z", false], ["M6.4 10.6 a4.2 4.2 0 1 0 8.4 0 a4.2 4.2 0 1 0 -8.4 0 Z", true], ["M14.6 15.2 l4.2 4.2 l-1.7 1.7 l-4.2 -4.2 z", false]],
   sun: [["M16.60 12.00 C16.60 13.99 15.32 15.76 13.42 16.37 C11.53 16.99 9.45 16.32 8.28 14.70 C7.11 13.09 7.11 10.91 8.28 9.30 C9.45 7.68 11.53 7.01 13.42 7.63 C15.32 8.24 16.60 10.01 16.60 12.00 Z", false], ["M10.9 1.4 h2.2 v3.8 h-2.2 z", false], ["M10.9 18.8 h2.2 v3.8 h-2.2 z", false], ["M1.4 10.9 h3.8 v2.2 H1.4 z", false], ["M18.8 10.9 h3.8 v2.2 h-3.8 z", false], ["M3.8 5.5 l1.7 -1.7 2.7 2.7 -1.7 1.7 z", false], ["M15.8 17.5 l1.7 -1.7 2.7 2.7 -1.7 1.7 z", false], ["M18.5 3.8 l1.7 1.7 -2.7 2.7 -1.7 -1.7 z", false], ["M6.5 15.8 l1.7 1.7 -2.7 2.7 -1.7 -1.7 z", false]],
   moon: [["M20.60 12.00 C20.60 15.73 18.20 19.03 14.66 20.18 C11.11 21.33 7.23 20.07 5.04 17.05 C2.85 14.04 2.85 9.96 5.04 6.95 C7.23 3.93 11.11 2.67 14.66 3.82 C18.20 4.97 20.60 8.27 20.60 12.00 Z", false], ["M23.20 10.40 C23.20 13.78 21.02 16.77 17.81 17.82 C14.60 18.86 11.08 17.72 9.09 14.98 C7.10 12.25 7.10 8.55 9.09 5.82 C11.08 3.08 14.60 1.94 17.81 2.98 C21.02 4.03 23.20 7.02 23.20 10.40 Z", true]],
   // первая помощь: щит с крестом (выбор заказчика)
@@ -120,6 +121,23 @@ function paintThemeButton() {
   btn.setAttribute("aria-label", btn.title);
 }
 
+// лупа в шапке — ссылка на страницу поиска
+function initSearchLink() {
+  const header = document.querySelector(".site-header__inner");
+  if (!header || document.getElementById("searchLink")) return;
+
+  const a = document.createElement("a");
+  a.id = "searchLink";
+  a.className = "theme-toggle search-btn";
+  a.href = "search.html";
+  a.innerHTML = uiIcon("search", 18);
+  a.title = "Поиск по вопросам";
+  a.setAttribute("aria-label", a.title);
+
+  const theme = document.getElementById("themeToggle");
+  header.insertBefore(a, theme);
+}
+
 function initTheme() {
   const header = document.querySelector(".site-header__inner");
   if (!header || document.getElementById("themeToggle")) {
@@ -137,6 +155,7 @@ function initTheme() {
 
   header.appendChild(btn);
   paintThemeButton();
+  initSearchLink();
 }
 
 // ---------- последний открытый билет (для кнопки «Продолжить») ----------
@@ -424,4 +443,125 @@ if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", initInstall);
 } else {
   initInstall();
+}
+
+// ---------- поиск по вопросам ----------
+
+const SEARCH_TOPICS = [
+  ["gor", "Газоопасные работы"],
+  ["zr", "Земляные работы"],
+  ["or", "Огневые работы"],
+  ["pb", "Пожарная безопасность"],
+  ["prr", "Погрузо-разгрузочные работы"],
+  ["rv", "Работы на высоте"],
+  ["egs", "Электросварочные и газосварочные работы"]
+];
+
+function escapeText(s) {
+  return String(s).replace(/[&<>"]/g, function (ch) {
+    return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[ch];
+  });
+}
+
+function initSearchPage() {
+  const page = document.getElementById("searchPage");
+  if (!page) return;
+
+  const input = document.getElementById("searchInput");
+  const chips = document.getElementById("searchChips");
+  const count = document.getElementById("searchCount");
+  const list = document.getElementById("searchResults");
+  let bank = null;
+  let activeTopic = "";
+
+  [["", "Все темы"]].concat(SEARCH_TOPICS).forEach(function (pair) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "chip" + (pair[0] === "" ? " chip--on" : "");
+    b.textContent = pair[1];
+    b.addEventListener("click", function () {
+      activeTopic = pair[0];
+      chips.querySelectorAll(".chip").forEach(function (el) {
+        el.classList.toggle("chip--on", el === b);
+      });
+      draw();
+    });
+    chips.appendChild(b);
+  });
+
+  function draw() {
+    if (!bank) return;
+    const q = input.value.trim().toLowerCase();
+    if (!q) {
+      count.textContent = "Начните печатать — поиск идёт по всем 977 вопросам";
+      list.innerHTML = "";
+      return;
+    }
+
+    const found = bank.filter(function (item) {
+      if (activeTopic && item.topic !== activeTopic) return false;
+      const hay = (item.question + " " + item.options.map(function (o) { return o.text; }).join(" ")).toLowerCase();
+      return hay.indexOf(q) !== -1;
+    });
+
+    count.textContent = found.length
+      ? "Найдено " + found.length + " " + questionsWord(found.length)
+      : "Ничего не найдено. Попробуйте другое слово.";
+
+    list.innerHTML = "";
+    found.slice(0, 60).forEach(function (item) {
+      const card = document.createElement("div");
+      card.className = "search-card";
+      card.innerHTML =
+        '<div class="search-card__q">' + escapeText(item.question) + "</div>" +
+        '<div class="search-card__meta">' + escapeText(item.topicTitle) +
+          " · вопрос " + (item.number + 1) + " из " + item.total + "</div>" +
+        '<button type="button" class="search-card__btn">Показать ответ</button>' +
+        '<ul class="search-card__answers" hidden>' +
+        item.options.map(function (o) {
+          return '<li class="' + (o.correct ? "is-right" : "") + '">' + escapeText(o.text) + "</li>";
+        }).join("") +
+        "</ul>";
+
+      const btn = card.querySelector(".search-card__btn");
+      const answers = card.querySelector(".search-card__answers");
+      btn.addEventListener("click", function () {
+        answers.hidden = !answers.hidden;
+        btn.textContent = answers.hidden ? "Показать ответ" : "Скрыть ответ";
+      });
+
+      list.appendChild(card);
+    });
+
+    if (found.length > 60) {
+      const more = document.createElement("p");
+      more.className = "search-count";
+      more.textContent = "Показаны первые 60. Уточните запрос или выберите тему.";
+      list.appendChild(more);
+    }
+  }
+
+  Promise.all(SEARCH_TOPICS.map(function (pair) {
+    return fetchJson("q-" + pair[0] + ".json").then(function (arr) {
+      return arr.map(function (q, i) {
+        return {
+          topic: pair[0], topicTitle: pair[1], number: i, total: arr.length,
+          question: q.question || "", options: q.options || []
+        };
+      });
+    });
+  })).then(function (banks) {
+    bank = [].concat.apply([], banks);
+    draw();
+  }).catch(function () {
+    count.textContent = "Не удалось загрузить вопросы. Проверьте интернет.";
+  });
+
+  input.addEventListener("input", draw);
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initSearchPage);
+} else {
+  initSearchPage();
 }

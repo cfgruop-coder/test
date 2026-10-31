@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Поиск по вопросам</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="common.css?v=9">
+<script>
+  // тема выбирается до первой отрисовки, чтобы страница не мигала
+  try {
+    var savedTheme = localStorage.getItem("theme.v1");
+    // светлая тема по умолчанию; тёмная — только если её выбрал сам пользователь
+    document.documentElement.setAttribute("data-theme", savedTheme === "dark" ? "dark" : "light");
+  } catch (e) {}
+</script>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-header__inner">
+    <a class="site-brand" href="index.html">
+      <div class="site-logo">✓</div>
+      <div>
+        <div class="site-title">SFGroup - тестирование</div>
+        <div class="site-subtitle">Тесты по охране труда</div>
+      </div>
+    </a>
+  </div>
+</header>
+
+<main class="page" id="searchPage">
+  <h1>Поиск по вопросам</h1>
+  <p class="page-note">Все 977 вопросов сайта. Найдётся по слову из вопроса или варианта ответа.</p>
+
+  <div class="search-box">
+    <input id="searchInput" type="search" placeholder="Введите слово, например: каска"
+           autocomplete="off" spellcheck="false">
+  </div>
+
+  <div class="chips" id="searchChips"></div>
+  <p class="search-count" id="searchCount"></p>
+  <div class="search-results" id="searchResults"></div>
+</main>
+
+
+<script src="common.js?v=6"></script>
+</body>
+</html>

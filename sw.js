@@ -1,11 +1,11 @@
 /* Оффлайн-копия сайта: складываем файлы в память устройства.
    При обновлении сайта меняем номер версии ниже — тогда у людей
    подтянется свежая копия. */
-const CACHE = "sfgroup-v2";
+const CACHE = "sfgroup-v3";
 
 const FILES = [
   "./", "index.html", "block.html", "test.html", "blitz.html",
-  "memo.html", "memo-quiz.html", "professions.html", "works.html",
+  "memo.html", "memo-quiz.html", "professions.html", "works.html", "search.html",
   "common.css", "common.js", "manifest.json",
   "logo.png", "logo-dark.png", "favicon.svg", "icon-512.png",
   "cover-memo.png", "cover-professions.png", "cover-works.png", "cover-blitz.png",

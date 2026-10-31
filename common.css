@@ -786,3 +786,36 @@ body {
 
 /* в тёмной теме иконка светлее и без заливки — не спорит с тёмной шапкой */
 [data-theme="dark"] .site-logo { background-image: url("logo-dark.png?v=1"); }
+
+/* ---------- поиск по вопросам ---------- */
+.search-box { margin: 18px 0 14px; }
+.search-box input {
+  width: 100%; box-sizing: border-box; padding: 14px 16px;
+  font: inherit; font-size: 15px; color: var(--text);
+  background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+}
+.search-box input:focus { outline: 2.5px solid var(--accent); outline-offset: 0; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.chip {
+  border: 1px solid var(--border); background: var(--surface); color: var(--text);
+  border-radius: 999px; padding: 7px 14px; font: inherit; font-size: 12.5px;
+  cursor: pointer; transition: background .15s, border-color .15s;
+}
+.chip:hover { border-color: var(--accent); }
+.chip--on { background: var(--accent); border-color: var(--accent); color: #fff; }
+.search-count { font-size: 12.5px; color: var(--muted); margin: 0 0 12px; }
+.search-results { display: flex; flex-direction: column; gap: 10px; }
+.search-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px 16px; }
+.search-card__q { font-weight: 700; font-size: 14px; color: var(--text); line-height: 1.35; }
+.search-card__meta { font-size: 12px; color: var(--muted); margin: 6px 0 10px; }
+.search-card__btn {
+  border: 0; border-radius: 9px; padding: 8px 14px; cursor: pointer;
+  background: rgba(31,111,235,.10); color: var(--accent);
+  font: inherit; font-size: 12.5px; font-weight: 700;
+}
+.search-card__answers { margin: 10px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.search-card__answers li { font-size: 13px; color: var(--text); line-height: 1.35; padding: 7px 10px; border-radius: 8px; background: rgba(128,140,160,.10); }
+.search-card__answers li.is-right { background: rgba(30,158,90,.14); font-weight: 600; }
+/* лупа в шапке: стоит слева от переключателя темы */
+.search-btn { margin-left: auto; }
+.search-btn + .theme-toggle { margin-left: 0; }
