@@ -1,7 +1,7 @@
 /* Оффлайн-копия сайта: складываем файлы в память устройства.
    При обновлении сайта меняем номер версии ниже — тогда у людей
    подтянется свежая копия. */
-const CACHE = "sfgroup-v3";
+const CACHE = "sfgroup-v4";
 
 const FILES = [
   "./", "index.html", "block.html", "test.html", "blitz.html",

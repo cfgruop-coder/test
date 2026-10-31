@@ -468,26 +468,10 @@ function initSearchPage() {
   if (!page) return;
 
   const input = document.getElementById("searchInput");
-  const chips = document.getElementById("searchChips");
   const count = document.getElementById("searchCount");
   const list = document.getElementById("searchResults");
   let bank = null;
-  let activeTopic = "";
 
-  [["", "Все темы"]].concat(SEARCH_TOPICS).forEach(function (pair) {
-    const b = document.createElement("button");
-    b.type = "button";
-    b.className = "chip" + (pair[0] === "" ? " chip--on" : "");
-    b.textContent = pair[1];
-    b.addEventListener("click", function () {
-      activeTopic = pair[0];
-      chips.querySelectorAll(".chip").forEach(function (el) {
-        el.classList.toggle("chip--on", el === b);
-      });
-      draw();
-    });
-    chips.appendChild(b);
-  });
 
   function draw() {
     if (!bank) return;
@@ -499,7 +483,6 @@ function initSearchPage() {
     }
 
     const found = bank.filter(function (item) {
-      if (activeTopic && item.topic !== activeTopic) return false;
       const hay = (item.question + " " + item.options.map(function (o) { return o.text; }).join(" ")).toLowerCase();
       return hay.indexOf(q) !== -1;
     });
